@@ -1,0 +1,8 @@
+{
+  "name": "fend-p5-neighborhood-map",
+  "version": "0.0.1",
+  "dependencies": {
+    "knockout": "~3.3.0",
+    "jquery": "~2.1.4"
+  }
+}
