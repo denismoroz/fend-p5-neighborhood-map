@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Neighborhood Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/style.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places"></script>
 </head>
 <body>
     <div class="container" id="main">
 
-        <input type="text" data-bind="textInput: placesFilterString, event:{change:filterPlaces}">
+        <input type="text" data-bind="textInput: placesFilterString, event: {keyup: filterPlaces}">
 
         <ul id="places-list" data-bind="foreach: selectedPlaces">
             <li>
@@ -20,8 +23,8 @@
             <h2 data-bind="text: name"></h2>
             <img src="" alt="place picture">
         </div> -->
-
-        <div id="map">
+        <div id="map-container">
+            <div id="map"></div>
         </div>
     </div>
 

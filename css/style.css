@@ -1,0 +1,12 @@
+#map {
+  display: block;
+  height: 100%;
+  margin-left: 5%;
+  margin-right: 5%;
+}
+
+#map-container {
+  height: 400px;
+  width: 100%;
+  padding-bottom: 5%;
+}
