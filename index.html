@@ -14,7 +14,7 @@
 
         <ul id="places-list" data-bind="foreach: selectedPlaces">
             <li>
-                <b data-bind="text: name"></b>
+                <b data-bind="text: name, click: $parent.showInfoWindow"></b>
             </li>
         </ul>
 

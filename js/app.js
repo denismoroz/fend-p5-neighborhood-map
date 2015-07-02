@@ -77,14 +77,20 @@ var ViewModel = function() {
 			content: name
 		});
 
+		place.data.infoWindow = infoWindow;
+
 		google.maps.event.addListener(marker, 'click', function() {
-			infoWindow.open(self.map, marker);
+			self.showInfoWindow(place);
 		});
 
 		self.bounds.extend(new google.maps.LatLng(lat, lon));
 		self.map.fitBounds(self.bounds);
 		self.map.setCenter(self.bounds.getCenter());
 	};
+
+	self.showInfoWindow = function(place) {
+		place.data.infoWindow.open(self.map, place.data.marker);
+	}
 
 	self.addNewPin = function(results, status) {
 		if (status == google.maps.places.PlacesServiceStatus.OK) {
