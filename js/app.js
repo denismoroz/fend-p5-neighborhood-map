@@ -2,31 +2,38 @@
 var Places = [
 	{
 		name: 'National Library of Belarus',
-		site: 'http://www.belarus.by/en/about-belarus/architecture/national-library'
+		site: 'http://www.belarus.by/en/about-belarus/architecture/national-library',
+		icon: 'images/library.png'
 	},
 	{
 		name: 'Victory Square, Minsk',
-		site: 'http://www.belarus.by/en/travel/belarus-life/victory-square'
+		site: 'http://www.belarus.by/en/travel/belarus-life/victory-square',
+		icon: 'images/citysquare.png'
 	},
 	{
 		name: 'Minsk Arena',
-		site: 'http://www.belarus.by/en/about-belarus/architecture/minsk-arena'
+		site: 'http://www.belarus.by/en/about-belarus/architecture/minsk-arena',
+		icon: 'images/bike_rising.png'
 	},
 	{
 		name: 'Dudutki Museum',
+		icon: 'images/museum_openair.png',
 		site: 'http://www.dudutki.by/en/'
 	},
 	{
 		name: 'Church of Saints Simon and Helena',
+		icon: 'images/church.png',
 		site: ''
 	},
 
 	{
 		name: 'Victory Park, Minsk',
+		icon: 'images/forest.png',
 		site: ''
 	},
 	{
 		name: 'Stalin Line',
+		icon: 'images/museum_war.png',
 		site: 'http://stalin-line.by/'
 	}
 ];
@@ -65,7 +72,8 @@ var ViewModel = function() {
 		var marker = new google.maps.Marker({
 			map: self.map,
 			position: placeData.geometry.location,
-			title: name
+			title: name,
+			icon: place.data.icon
 		});
 
 		place.data.marker = marker;
@@ -90,6 +98,11 @@ var ViewModel = function() {
 
 	self.showInfoWindow = function(place) {
 		place.data.infoWindow.open(self.map, place.data.marker);
+		place.data.marker.setAnimation(google.maps.Animation.BOUNCE);
+
+		setTimeout(function() {
+			place.data.marker.setAnimation(null);
+		}, 1000);
 	}
 
 	self.addNewPin = function(results, status) {
