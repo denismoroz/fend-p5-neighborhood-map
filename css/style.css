@@ -61,7 +61,7 @@ video {
 	max-width: 100%;
 	position: relative;
 	width: 900px;
-	height: 60px;
+	height: 600px;
 }
 
 .jssora01l {
@@ -118,3 +118,11 @@ video {
 h1 {
 	text-align: center;
 }
+
+
+@media only screen and (max-width: 480px) {
+  .search {
+    display: block;
+  }
+}
+
