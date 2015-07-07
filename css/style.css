@@ -119,6 +119,9 @@ h1 {
 	text-align: center;
 }
 
+#place-name {
+	text-align: center;
+}
 
 @media only screen and (max-width: 480px) {
   .search {

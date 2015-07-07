@@ -55,7 +55,8 @@ var FlickrLoader = function() {
 	            '<span u="arrowright" class="jssora01r"></span>' +
 	        '</div>'
 
-	self.$sliderContainer = $(".slider-container");
+	self.$sliderContainer = $('.slider-container');
+	self.$placeName = $('#place-name');
 
 	self.loadPlacePictures = function (place) {
 
@@ -128,6 +129,8 @@ var FlickrLoader = function() {
         $(window).bind("load", scaleSlider);
         $(window).bind("resize", scaleSlider);
         $(window).bind("orientationchange", scaleSlider);
+
+        self.$placeName.text(place.name());
 	}
 }
 
