@@ -2,39 +2,32 @@
 var Places = [
 	{
 		name: 'National Library of Belarus',
-		site: 'http://www.belarus.by/en/about-belarus/architecture/national-library',
 		icon: 'images/library.png'
 	},
 	{
 		name: 'Victory Square, Minsk',
-		site: 'http://www.belarus.by/en/travel/belarus-life/victory-square',
 		icon: 'images/citysquare.png'
 	},
 	{
 		name: 'Minsk Arena',
-		site: 'http://www.belarus.by/en/about-belarus/architecture/minsk-arena',
 		icon: 'images/bike_rising.png'
 	},
 	{
 		name: 'Dudutki Museum',
-		icon: 'images/museum_openair.png',
-		site: 'http://www.dudutki.by/en/'
+		icon: 'images/museum_openair.png'
 	},
 	{
 		name: 'Church of Saints Simon and Helena',
-		icon: 'images/church.png',
-		site: ''
+		icon: 'images/church.png'
 	},
 
 	{
 		name: 'Victory Park, Minsk',
-		icon: 'images/forest.png',
-		site: ''
+		icon: 'images/forest.png'
 	},
 	{
 		name: 'Stalin Line',
-		icon: 'images/museum_war.png',
-		site: 'http://stalin-line.by/'
+		icon: 'images/museum_war.png'
 	}
 ];
 
@@ -45,49 +38,48 @@ var Place = function (data) {
 };
 
 
-var FlickrLoader = function() {
+var ImagesLoader = function() {
 	var apiKey = '6c64e861d08e001df254252d9e8ff9a1';
 	var self = this;
 
 	self.sliderTemplate = '<div id="slider">' +
-	            '<div id="pictures" u="slides" ></div>' +
-	            '<span u="arrowleft" class="jssora01l"></span>' +
-	            '<span u="arrowright" class="jssora01r"></span>' +
-	        '</div>'
+				'<div id="pictures" u="slides" ></div>' +
+				'<span u="arrowleft" class="jssora01l"></span>' +
+				'<span u="arrowright" class="jssora01r"></span>' +
+			'</div>'
 
 	self.$sliderContainer = $('.slider-container');
 	self.$placeName = $('#place-name');
 
 	self.loadPlacePictures = function (place) {
 
-    	//query the Flickr API
+		//query the Flickr API
+		var url = 'https://api.flickr.com/services/rest/?method=flickr.photos.search&' +
+			'api_key=' + apiKey + '&' +
+			'safe_search=1&per_page=20&jsoncallback=?'
 
-        var url = 'https://api.flickr.com/services/rest/?method=flickr.photos.search&' +
-        	'api_key=' + apiKey + '&' +
-        	'safe_search=1&per_page=20&jsoncallback=?'
-
-        $.getJSON(url,
-        	{
-	            text: place.name,
-	            tags: place.name,
-	            format: "json"
-       		},
-        	function(data) {
-        		var images = []
-	            $.each(data.photos.photo, function(i, photo){
-	            	var url = 'https://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}.jpg'
-	            	url = url.replace('{farm-id}', photo.farm);
-	            	url = url.replace('{server-id}', photo.server);
-	            	url = url.replace('{id}', photo.id);
-	            	url = url.replace('{secret}', photo.secret);
-	            	images.push(url);
-	            });
-	            place.images = images;
-        	}
-        );
+		$.getJSON(url,
+			{
+				text: place.name,
+				tags: place.name,
+				format: "json"
+			},
+			function(data) {
+			var images = []
+				$.each(data.photos.photo, function(i, photo) {
+					var url = 'https://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}.jpg'
+					url = url.replace('{farm-id}', photo.farm);
+					url = url.replace('{server-id}', photo.server);
+					url = url.replace('{id}', photo.id);
+					url = url.replace('{secret}', photo.secret);
+					images.push(url);
+				});
+				place.images = images;
+			}
+		);
 	}
 
-	self.showPictures = function (place) {
+	self.showImages = function (place) {
 		$('#slider').remove();
 		self.$sliderContainer.append(self.sliderTemplate);
 
@@ -100,47 +92,44 @@ var FlickrLoader = function() {
 		);
 
 		var options = {
-                $DragOrientation: 3,                                //[Optional] Orientation to drag slide, 0 no drag, 1 horizental, 2 vertical, 3 either, default value is 1 (Note that the $DragOrientation should be the same as $PlayOrientation when $DisplayPieces is greater than 1, or parking position is not 0)
-                $SlideDuration: 500,                                //[Optional] Specifies default duration (swipe) for slide in milliseconds, default value is 500
+				$DragOrientation: 3,                                //[Optional] Orientation to drag slide, 0 no drag, 1 horizental, 2 vertical, 3 either, default value is 1 (Note that the $DragOrientation should be the same as $PlayOrientation when $DisplayPieces is greater than 1, or parking position is not 0)
+				$SlideDuration: 500,                                //[Optional] Specifies default duration (swipe) for slide in milliseconds, default value is 500
 
-                $ArrowNavigatorOptions: {                       //[Optional] Options to specify and enable arrow navigator or not
-                    $Class: $JssorArrowNavigator$,              //[Requried] Class to create arrow navigator instance
-                    $ChanceToShow: 2,                               //[Required] 0 Never, 1 Mouse Over, 2 Always
-                    $AutoCenter: 0,                                 //[Optional] Auto center arrows in parent container, 0 No, 1 Horizontal, 2 Vertical, 3 Both, default value is 0
-                    $Steps: 1                                       //[Optional] Steps to go for each navigation request, default value is 1
-                }
-            };
-
-
-        var jssor_slider1 = new $JssorSlider$('slider', options);
+				$ArrowNavigatorOptions: {                       //[Optional] Options to specify and enable arrow navigator or not
+					$Class: $JssorArrowNavigator$,              //[Requried] Class to create arrow navigator instance
+					$ChanceToShow: 2,                               //[Required] 0 Never, 1 Mouse Over, 2 Always
+					$AutoCenter: 0,                                 //[Optional] Auto center arrows in parent container, 0 No, 1 Horizontal, 2 Vertical, 3 Both, default value is 0
+					$Steps: 1                                       //[Optional] Steps to go for each navigation request, default value is 1
+				}
+		};
 
 
-        function scaleSlider() {
-            var parentWidth = $('#slider').parent().width();
-            if (parentWidth) {
-                jssor_slider1.$ScaleWidth(parentWidth);
-            }
-            else
-                window.setTimeout(scaleSlider, 30);
-        }
+		var jssor_slider1 = new $JssorSlider$('slider', options);
 
-        scaleSlider();
 
-        $(window).bind("load", scaleSlider);
-        $(window).bind("resize", scaleSlider);
-        $(window).bind("orientationchange", scaleSlider);
-
-        self.$placeName.text(place.name());
+		function scaleSlider() {
+			var parentWidth = $('#slider').parent().width();
+			if (parentWidth) {
+				jssor_slider1.$ScaleWidth(parentWidth);
+			}
+			else {
+				window.setTimeout(scaleSlider, 30);
+			}
+		}
+		scaleSlider();
+		$(window).bind("load", scaleSlider);
+		$(window).bind("resize", scaleSlider);
+		$(window).bind("orientationchange", scaleSlider);
+		self.$placeName.text(place.name());
 	}
 }
-
 
 var ViewModel = function() {
 	var self = this;
 
 	this.placesFilterString = ko.observable();
 	this.selectedPlaces = ko.observableArray([]);
-	self.imageLoader = new FlickrLoader();
+	self.imageLoader = new ImagesLoader();
 
 
 	Places.forEach(function(place) {
@@ -197,7 +186,7 @@ var ViewModel = function() {
 			place.data.marker.setAnimation(null);
 		}, 1000);
 
-		self.imageLoader.showPictures(place);
+		self.imageLoader.showImages(place);
 	}
 
 	self.addNewPin = function(results, status) {
@@ -276,5 +265,3 @@ var ViewModel = function() {
 }
 
 ko.applyBindings(new ViewModel);
-
-
