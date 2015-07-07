@@ -1,12 +1,120 @@
+/* jssor slider arrow navigator skin 01 css */
+/*
+.jssora01l                  (normal)
+.jssora01r                  (normal)
+.jssora01l:hover            (normal mouseover)
+.jssora01r:hover            (normal mouseover)
+.jssora01l.jssora01ldn      (mousedown)
+.jssora01r.jssora01rdn      (mousedown)
+*/
+.jssora01l,
+.jssora01r {
+	display: block;
+	position: absolute;
+	/* size of arrow element */
+	width: 45px;
+	height: 45px;
+	cursor: pointer;
+	background: url(../images/a01.png) no-repeat;
+	overflow: hidden;
+}
+
+.jssora01l {
+	background-position: -8px -38px;
+}
+
+.jssora01r {
+	background-position: -68px -38px;
+}
+
+.jssora01l:hover {
+	background-position: -128px -38px;
+}
+
+.jssora01r:hover {
+	background-position: -188px -38px;
+}
+
+.jssora01l.jssora01ldn {
+	background-position: -8px -38px;
+}
+
+.jssora01r.jssora01rdn {
+	background-position: -68px -38px;
+}
+
+
+img,
+embed,
+object,
+video {
+	max-width: 100%;
+}
+
+.row {
+	width: 900px;
+	max-width: 100%;
+	margin: 0 auto 0 auto;
+}
+
+#slider {
+	max-width: 100%;
+	position: relative;
+	width: 900px;
+	height: 60px;
+}
+
+.jssora01l {
+	top: 50px;
+	left: 8px;
+}
+
+.jssora01r {
+	top: 50px;
+	right: 8px;
+}
+
+#pictures {
+	max-width: 100%;
+	cursor: move;
+	position: absolute;
+	overflow: hidden;
+	width: 900px;
+	height: 600px;
+}
+
 #map {
-  display: block;
-  height: 100%;
-  margin-left: 5%;
-  margin-right: 5%;
+	display: block;
+	height: 100%;
 }
 
 #map-container {
-  height: 400px;
-  width: 100%;
-  padding-bottom: 5%;
+	height: 300px;
+	width: 100%;
+	padding-bottom: 5%;
+}
+
+.search-bar {
+	margin-top: 2%;
+}
+
+.search-line {
+	display: flex;
+}
+
+.search-input {
+	width: 100%;
+}
+
+.search-icon {
+	margin-right: 2%;
+	margin-top: 2%;
+}
+
+.search {
+	display: flex;
+}
+
+h1 {
+	text-align: center;
 }
