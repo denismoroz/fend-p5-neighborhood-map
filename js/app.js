@@ -62,12 +62,16 @@ var ImagesLoader = function() {
 		};
 	};
 
+	self.showError = function(message) {
+		self.$sliderContainer.html('<h3> ' + message + '</h3>');
+	};
+
 	self.loadImages = function (place) {
 
 		//query the Flickr API
 		var url = 'https://api.flickr.com/services/rest/?method=flickr.photos.search&' +
 			'api_key=' + apiKey + '&' +
-			'safe_search=1&per_page=20&jsoncallback=?'
+			'safe_search=1&per_page=20&jsoncallback=?';
 
 		$.getJSON(url,
 			{
@@ -87,7 +91,10 @@ var ImagesLoader = function() {
 				});
 				place.data.images = images;
 			}
-		);
+		)
+		.fail(function() {
+			self.showError("Failed to load images from flickr, please try later");
+  		});
 	}
 
 	self.showImages = function (place) {
@@ -141,6 +148,11 @@ var MapController = function(viewModel) {
 	var self = this;
 	self.viewModel = viewModel;
 
+
+	self.showError = function(message) {
+		$('#map').append('<h3>' + message + '</h3>');
+	};
+
 	/*
 	  createMapMarker(place, placeData) reads Google Places search results to create map pins.
 	  For later manupulations marker saved in place.data
@@ -183,9 +195,13 @@ var MapController = function(viewModel) {
 		self.map.setCenter(self.bounds.getCenter());
 	};
 
-
 	// showInfoWindow(place) called when user clicks on marker
 	self.showInfoWindow = function(place) {
+		if (typeof place.data.infoWindow === 'undefined') {
+			self.showError("Google Maps Components are not loaded. Please try later.");
+			return;
+		}
+
 		place.data.infoWindow.open(self.map, place.data.marker);
 		place.data.marker.setAnimation(google.maps.Animation.BOUNCE);
 
@@ -209,6 +225,12 @@ var MapController = function(viewModel) {
 	self.loadPlaces = function(places) {
 		// creates a Google place search service object. PlacesService does the work of
 		// actually searching for location data.
+
+		if (typeof google === 'undefined') {
+			self.showError('Failed to load Google.PlacesService to request places information');
+			return;
+		}
+
 		var service = new google.maps.places.PlacesService(self.map);
 		// Iterates through the array of places and load info about them.
 		//var places = self.selectedPlaces();
@@ -258,6 +280,11 @@ var MapController = function(viewModel) {
 				disableDefaultUI: false
 		};
 
+		if (typeof google === 'undefined') {
+			self.showError('Failed to load Google Map Components, please try later.');
+			return;
+		};
+
 		self.map = new google.maps.Map(document.querySelector('#map'), mapOptions);
 		self.bounds = new google.maps.LatLngBounds();
 
@@ -277,8 +304,6 @@ var ViewModel = function() {
 		this.selectedPlaces = ko.observableArray([]);
 		self.imageLoader = new ImagesLoader();
 		self.mapController = new MapController(self);
-
-		self.mapController.init();
 
 		Places.forEach(function(place) {
 			self.selectedPlaces.push(new Place(place));
