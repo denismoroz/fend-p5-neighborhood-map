@@ -1,3 +1,4 @@
+/*global ko, $, $JssorArrowNavigator$, $JssorSlider$, window, google, setTimeout, document*/
 
 var Places = [
 	{
@@ -31,7 +32,9 @@ var Places = [
 	}
 ];
 
+
 var Place = function (data) {
+	'use strict';
 	this.name = ko.observable(data.name);
 	this.data = data;
 };
@@ -42,47 +45,47 @@ var Place = function (data) {
 */
 
 var ImagesLoader = function() {
-	var apiKey = '6c64e861d08e001df254252d9e8ff9a1';
+	'use strict';
+
 	var self = this;
 
+	self.apiKey = '6c64e861d08e001df254252d9e8ff9a1';
 	self.sliderTemplate = '<div id="slider">' +
 				'<div id="pictures" u="slides" ></div>' +
 				'<span u="arrowleft" class="jssora01l"></span>' +
 				'<span u="arrowright" class="jssora01r"></span>' +
-			'</div>'
+			'</div>';
 
 	self.$sliderContainer = $('.slider-container');
 	self.$placeName = $('#place-name');
 
-
-	self.loadPlaces = function(places) {
-		for (var place_i in places) {
-			var place = places[place_i];
-			self.loadImages(place);
-		};
-	};
-
 	self.showError = function(message) {
 		self.$sliderContainer.html('<h3> ' + message + '</h3>');
+	};
+
+	self.loadPlaces = function(places) {
+		places.forEach(function(place) {
+			self.loadImages(place);
+		});
 	};
 
 	self.loadImages = function (place) {
 
 		//query the Flickr API
 		var url = 'https://api.flickr.com/services/rest/?method=flickr.photos.search&' +
-			'api_key=' + apiKey + '&' +
+			'api_key=' + self.apiKey + '&' +
 			'safe_search=1&per_page=20&jsoncallback=?';
 
 		$.getJSON(url,
 			{
 				text: place.name(),
 				tags: place.name(),
-				format: "json"
+				format: 'json'
 			},
 			function(data) {
-				var images = []
-				$.each(data.photos.photo, function(i, photo) {
-					var url = 'https://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}.jpg'
+				var images = [];
+				data.photos.photo.forEach(function(photo) {
+					var url = 'https://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}.jpg';
 					url = url.replace('{farm-id}', photo.farm);
 					url = url.replace('{server-id}', photo.server);
 					url = url.replace('{id}', photo.id);
@@ -93,35 +96,41 @@ var ImagesLoader = function() {
 			}
 		)
 		.fail(function() {
-			self.showError("Failed to load images from flickr, please try later");
+			self.showError('Failed to load images from Flickr, please try later');
   		});
-	}
+	};
 
+	/*
+		showImages(place) for selected place load images to slider.
+	*/
 	self.showImages = function (place) {
 		$('#slider').remove();
 		self.$sliderContainer.append(self.sliderTemplate);
 
-		var $pictures = $('#pictures');
-		$.each(place.data.images,
-			function(i, image){
+		var $pictures = $('#pictures'),
+			options,
+			slider;
+
+		place.data.images.forEach(
+			function(image){
 				var slide = '<div id="slide"><img class="img-responsive" u="image" src="' + image + '" /></div>';
 				$pictures.append(slide);
 			}
 		);
 
-		var options = {
-				$DragOrientation: 3,     //[Optional] Orientation to drag slide, 0 no drag, 1 horizental, 2 vertical, 3 either, default value is 1 (Note that the $DragOrientation should be the same as $PlayOrientation when $DisplayPieces is greater than 1, or parking position is not 0)
-				$SlideDuration: 500,     //[Optional] Specifies default duration (swipe) for slide in milliseconds, default value is 500
+		options = {
+			$DragOrientation: 3,     //[Optional] Orientation to drag slide, 0 no drag, 1 horizental, 2 vertical, 3 either, default value is 1 (Note that the $DragOrientation should be the same as $PlayOrientation when $DisplayPieces is greater than 1, or parking position is not 0)
+			$SlideDuration: 500,     //[Optional] Specifies default duration (swipe) for slide in milliseconds, default value is 500
 
-				$ArrowNavigatorOptions: {          //[Optional] Options to specify and enable arrow navigator or not
-					$Class: $JssorArrowNavigator$, //[Requried] Class to create arrow navigator instance
-					$ChanceToShow: 2,              //[Required] 0 Never, 1 Mouse Over, 2 Always
-					$AutoCenter: 0,                //[Optional] Auto center arrows in parent container, 0 No, 1 Horizontal, 2 Vertical, 3 Both, default value is 0
-					$Steps: 1                      //[Optional] Steps to go for each navigation request, default value is 1
-				}
+			$ArrowNavigatorOptions: {          //[Optional] Options to specify and enable arrow navigator or not
+				$Class: $JssorArrowNavigator$, //[Requried] Class to create arrow navigator instance
+				$ChanceToShow: 2,              //[Required] 0 Never, 1 Mouse Over, 2 Always
+				$AutoCenter: 0,                //[Optional] Auto center arrows in parent container, 0 No, 1 Horizontal, 2 Vertical, 3 Both, default value is 0
+				$Steps: 1                      //[Optional] Steps to go for each navigation request, default value is 1
+			}
 		};
 
-		var slider = new $JssorSlider$('slider', options);
+		slider = new $JssorSlider$('slider', options);
 
 		function scaleSlider() {
 			var parentWidth = $('#slider').parent().width();
@@ -133,18 +142,18 @@ var ImagesLoader = function() {
 			}
 		}
 		scaleSlider();
-		$(window).bind("load", scaleSlider);
-		$(window).bind("resize", scaleSlider);
-		$(window).bind("orientationchange", scaleSlider);
+		$(window).bind('load', scaleSlider);
+		$(window).bind('resize', scaleSlider);
+		$(window).bind('orientationchange', scaleSlider);
 		self.$placeName.text(place.name());
-	}
-}
-
+	};
+};
 /*
 	This object is responsible for map controlling.
 	Load gps coodinates for markers and show/hide them according to selected places set.
 */
 var MapController = function(viewModel) {
+	'use strict';
 	var self = this;
 	self.viewModel = viewModel;
 
@@ -163,27 +172,26 @@ var MapController = function(viewModel) {
 	self.createMapMarker = function (place, placeData) {
 
 		// The next lines save location data from the search result object to local variables
-		var lat = placeData.geometry.location.lat();  // latitude from the place service
-		var lon = placeData.geometry.location.lng();  // longitude from the place service
-		var name = place.name();   // name of the place from the place service
+		var lat = placeData.geometry.location.lat(),  // latitude from the place service
+			lon = placeData.geometry.location.lng(),  // longitude from the place service
+			name = place.name(),   // name of the place from the place service
 		            // current boundaries of the map window
 
-		// marker is an place object
-		var marker = new google.maps.Marker({
-			map: self.map,
-			position: placeData.geometry.location,
-			title: name,
-			icon: place.data.icon
-		});
+			// marker is an place object
+			marker = new google.maps.Marker({
+				map: self.map,
+				position: placeData.geometry.location,
+				title: name,
+				icon: place.data.icon
+			}),
 
-		// save marker in a place object for later manupulations
-		place.data.marker = marker;
-
-		var infoWindow = new google.maps.InfoWindow({
-			content: name
-		});
+			infoWindow = new google.maps.InfoWindow({
+				content: name
+			});
 
 		place.data.infoWindow = infoWindow;
+		// save marker in a place object for later manupulations
+		place.data.marker = marker;
 
 		google.maps.event.addListener(marker, 'click', function() {
 			// notify ViewModel about click on the marker that is needed to separate MapController and ImageLoader using ViewModel.
@@ -197,8 +205,8 @@ var MapController = function(viewModel) {
 
 	// showInfoWindow(place) called when user clicks on marker
 	self.showInfoWindow = function(place) {
-		if (typeof place.data.infoWindow === 'undefined') {
-			self.showError("Google Maps Components are not loaded. Please try later.");
+		if (place.data.infoWindow === undefined) {
+			self.showError('Google Maps Components are not loaded. Please try later.');
 			return;
 		}
 
@@ -209,11 +217,11 @@ var MapController = function(viewModel) {
 		setTimeout(function() {
 			place.data.marker.setAnimation(null);
 		}, 1000);
-	}
+	};
 
 	// add a new pin on map, called once on map loading
 	self.addNewPin = function(results, status) {
-		if (status == google.maps.places.PlacesServiceStatus.OK) {
+		if (status === google.maps.places.PlacesServiceStatus.OK) {
 			self.createMapMarker(results[0]);
 		}
 	};
@@ -226,51 +234,56 @@ var MapController = function(viewModel) {
 		// creates a Google place search service object. PlacesService does the work of
 		// actually searching for location data.
 
-		if (typeof google === 'undefined') {
+		if (window.google === undefined) {
 			self.showError('Failed to load Google.PlacesService to request places information');
 			return;
 		}
 
-		var service = new google.maps.places.PlacesService(self.map);
-		// Iterates through the array of places and load info about them.
-		//var places = self.selectedPlaces();
-		for (var place_i in places) {
-			var place = places[place_i];
-			var place_name = place.name();
+		var service = new google.maps.places.PlacesService(self.map),
+			request,
+			place_name;
 
+		// Iterates through the array of places and load info about them.
+		places.forEach(function(place) {
+			place_name = place.name();
 			// the search request object
-			var request = {
+			request = {
 				query: place_name
 			};
 
 			service.textSearch(request, (function(place) {
 				return function (results, status) {
-					if (status == google.maps.places.PlacesServiceStatus.OK) {
+					if (status === google.maps.places.PlacesServiceStatus.OK) {
 						self.createMapMarker(place, results[0]);
 					}
-				}
+				};
 			})(place));
-		}
+		});
 	};
 
 	// Show markers for currently selected places. If place in places list then marker is shown,
 	// otherwise marker is removed from map
 	self.showMarkers = function(places) {
 		Places.forEach(function(place) {
-			if (null != place.marker) {
+			if (null !== place.marker) {
 				place.marker.setMap(null);
-			};
+			}
 		});
 
-		for (var place_i in places) {
-			var place = places[place_i];
-			if (null != place.data.marker) {
+		var place_i,
+			places_size = places.length,
+			place;
+
+
+		for (place_i = 0; place_i < places_size; place_i += 1) {
+			place = places[place_i];
+			if (null !== place.data.marker) {
 				place.data.marker.setMap(self.map);
 			}
-		};
+		}
 
 		self.map.fitBounds(self.bounds);
-	}
+	};
 
 	/*
 		init() creates a map and load places information
@@ -280,23 +293,25 @@ var MapController = function(viewModel) {
 				disableDefaultUI: false
 		};
 
-		if (typeof google === 'undefined') {
+		if (window.google === undefined) {
 			self.showError('Failed to load Google Map Components, please try later.');
 			return;
-		};
+		}
 
 		self.map = new google.maps.Map(document.querySelector('#map'), mapOptions);
 		self.bounds = new google.maps.LatLngBounds();
 
-		window.addEventListener('resize', function(e) {
+		window.addEventListener('resize', function() {
 			self.map.fitBounds(self.bounds);
 		});
 	};
 
 	self.init();
-}
+};
 
 var ViewModel = function() {
+	'use strict';
+
 	var self = this;
 
 	self.init = function() {
@@ -312,7 +327,7 @@ var ViewModel = function() {
 		var selectedPlaces = self.selectedPlaces();
 		self.mapController.loadPlaces(selectedPlaces);
 		self.imageLoader.loadPlaces(selectedPlaces);
-	}
+	};
 
 	self.onPlaceClick = function(place) {
 		self.mapController.showInfoWindow(place);
@@ -320,19 +335,20 @@ var ViewModel = function() {
 	};
 
 	self.filterPlaces = function() {
-		var filter = self.placesFilterString()
+		var filter = self.placesFilterString(),
+			regex = new RegExp(filter, 'i');
+
 		this.selectedPlaces.removeAll();
-		var regex = new RegExp(filter, "i");
 
 		Places.forEach(function(place) {
-			if (place.name.search(regex) != -1) {
+			if (place.name.search(regex) !== -1) {
 				self.selectedPlaces.push(new Place(place));
-			};
+			}
 		});
 		this.mapController.showMarkers(self.selectedPlaces());
 	};
 
 	self.init();
-}
+};
 
-ko.applyBindings(new ViewModel);
+ko.applyBindings(new ViewModel());
