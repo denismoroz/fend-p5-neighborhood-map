@@ -51,13 +51,13 @@ var ImagesLoader = function() {
 
 	self.apiKey = '6c64e861d08e001df254252d9e8ff9a1';
 	self.sliderTemplate = '<div id="slider">' +
-				'<div id="pictures" u="slides" ></div>' +
+				'<div class="pictures" u="slides" ></div>' +
 				'<span u="arrowleft" class="jssora01l"></span>' +
 				'<span u="arrowright" class="jssora01r"></span>' +
 			'</div>';
 
 	self.$sliderContainer = $('.slider-container');
-	self.$placeName = $('#place-name');
+	self.$placeName = $('.place-name');
 
 	self.showError = function(message) {
 		self.$sliderContainer.html('<h3> ' + message + '</h3>');
@@ -107,13 +107,13 @@ var ImagesLoader = function() {
 		$('#slider').remove();
 		self.$sliderContainer.append(self.sliderTemplate);
 
-		var $pictures = $('#pictures'),
+		var $pictures = $('.pictures'),
 			options,
 			slider;
 
 		place.data.images.forEach(
 			function(image){
-				var slide = '<div id="slide"><img class="img-responsive" u="image" src="' + image + '" /></div>';
+				var slide = '<div class="slide"><img class="img-responsive" u="image" src="' + image + '" /></div>';
 				$pictures.append(slide);
 			}
 		);
@@ -133,7 +133,7 @@ var ImagesLoader = function() {
 		slider = new $JssorSlider$('slider', options);
 
 		function scaleSlider() {
-			var parentWidth = $('#slider').parent().width();
+			var parentWidth = $('.slider').parent().width();
 			if (parentWidth) {
 				slider.$ScaleWidth(parentWidth);
 			}
@@ -148,6 +148,7 @@ var ImagesLoader = function() {
 		self.$placeName.text(place.name());
 	};
 };
+
 /*
 	This object is responsible for map controlling.
 	Load gps coodinates for markers and show/hide them according to selected places set.
@@ -159,7 +160,7 @@ var MapController = function(viewModel) {
 
 
 	self.showError = function(message) {
-		$('#map').append('<h3>' + message + '</h3>');
+		$('.map').append('<h3>' + message + '</h3>');
 	};
 
 	/*
@@ -298,7 +299,7 @@ var MapController = function(viewModel) {
 			return;
 		}
 
-		self.map = new google.maps.Map(document.querySelector('#map'), mapOptions);
+		self.map = new google.maps.Map(document.querySelector('.map'), mapOptions);
 		self.bounds = new google.maps.LatLngBounds();
 
 		window.addEventListener('resize', function() {

@@ -5,9 +5,7 @@
     <title>Neighborhood Map</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="css/style.css" rel="stylesheet" type="text/css">
-    <script src="http://maps.googleapis.com/maps/api/js?libraries=places"></script>
-    <link href="bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css">
-    <link href="bower_components/bootstrap/dist/css/bootstrap-theme.css" rel="stylesheet" type="text/css">
+    <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
 </head>
 <body>
     <div class="container-fluid" id="main">
@@ -24,27 +22,28 @@
                         <input class="search-input" type="text" data-bind="textInput: placesFilterString, event: {keyup: filterPlaces}">
                     </div>
 
-                    <ul id="places-list" data-bind="foreach: selectedPlaces">
+                    <ul data-bind="foreach: selectedPlaces">
                         <li>
                             <b data-bind="text: name, click: $parent.onPlaceClick"></b>
                         </li>
                     </ul>
                 </div>
             </div>
-            <div class="col-md-8" id="map-container">
-                <div id="map"></div>
+            <div class="map-container col-md-8">
+                <div class="map"></div>
             </div>
         </div>
 
         <div class="row">
-            <h2 id="place-name"></h2>
+            <h2 class="place-name"></h2>
             <div class="slider-container col-md-12">
             </div>
         </div>
     </div>
 
+    <script src="http://maps.googleapis.com/maps/api/js?libraries=places"></script>
     <script src="bower_components/knockout/dist/knockout.js"></script>
-    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/jssor-slider/js/jssor.slider.mini.js"></script>
     <script src="js/app.js"></script>
 </body>
