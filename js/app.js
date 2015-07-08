@@ -33,10 +33,13 @@ var Places = [
 
 var Place = function (data) {
 	this.name = ko.observable(data.name);
-	this.site = ko.observable(data.site);
 	this.data = data;
 };
 
+
+/*
+	Request images from flickr api and show them in jssor slider
+*/
 
 var ImagesLoader = function() {
 	var apiKey = '6c64e861d08e001df254252d9e8ff9a1';
@@ -51,7 +54,15 @@ var ImagesLoader = function() {
 	self.$sliderContainer = $('.slider-container');
 	self.$placeName = $('#place-name');
 
-	self.loadPlacePictures = function (place) {
+
+	self.loadPlaces = function(places) {
+		for (var place_i in places) {
+			var place = places[place_i];
+			self.loadImages(place);
+		};
+	};
+
+	self.loadImages = function (place) {
 
 		//query the Flickr API
 		var url = 'https://api.flickr.com/services/rest/?method=flickr.photos.search&' +
@@ -60,12 +71,12 @@ var ImagesLoader = function() {
 
 		$.getJSON(url,
 			{
-				text: place.name,
-				tags: place.name,
+				text: place.name(),
+				tags: place.name(),
 				format: "json"
 			},
 			function(data) {
-			var images = []
+				var images = []
 				$.each(data.photos.photo, function(i, photo) {
 					var url = 'https://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}.jpg'
 					url = url.replace('{farm-id}', photo.farm);
@@ -74,7 +85,7 @@ var ImagesLoader = function() {
 					url = url.replace('{secret}', photo.secret);
 					images.push(url);
 				});
-				place.images = images;
+				place.data.images = images;
 			}
 		);
 	}
@@ -92,25 +103,23 @@ var ImagesLoader = function() {
 		);
 
 		var options = {
-				$DragOrientation: 3,                                //[Optional] Orientation to drag slide, 0 no drag, 1 horizental, 2 vertical, 3 either, default value is 1 (Note that the $DragOrientation should be the same as $PlayOrientation when $DisplayPieces is greater than 1, or parking position is not 0)
-				$SlideDuration: 500,                                //[Optional] Specifies default duration (swipe) for slide in milliseconds, default value is 500
+				$DragOrientation: 3,     //[Optional] Orientation to drag slide, 0 no drag, 1 horizental, 2 vertical, 3 either, default value is 1 (Note that the $DragOrientation should be the same as $PlayOrientation when $DisplayPieces is greater than 1, or parking position is not 0)
+				$SlideDuration: 500,     //[Optional] Specifies default duration (swipe) for slide in milliseconds, default value is 500
 
-				$ArrowNavigatorOptions: {                       //[Optional] Options to specify and enable arrow navigator or not
-					$Class: $JssorArrowNavigator$,              //[Requried] Class to create arrow navigator instance
-					$ChanceToShow: 2,                               //[Required] 0 Never, 1 Mouse Over, 2 Always
-					$AutoCenter: 0,                                 //[Optional] Auto center arrows in parent container, 0 No, 1 Horizontal, 2 Vertical, 3 Both, default value is 0
-					$Steps: 1                                       //[Optional] Steps to go for each navigation request, default value is 1
+				$ArrowNavigatorOptions: {          //[Optional] Options to specify and enable arrow navigator or not
+					$Class: $JssorArrowNavigator$, //[Requried] Class to create arrow navigator instance
+					$ChanceToShow: 2,              //[Required] 0 Never, 1 Mouse Over, 2 Always
+					$AutoCenter: 0,                //[Optional] Auto center arrows in parent container, 0 No, 1 Horizontal, 2 Vertical, 3 Both, default value is 0
+					$Steps: 1                      //[Optional] Steps to go for each navigation request, default value is 1
 				}
 		};
 
-
-		var jssor_slider1 = new $JssorSlider$('slider', options);
-
+		var slider = new $JssorSlider$('slider', options);
 
 		function scaleSlider() {
 			var parentWidth = $('#slider').parent().width();
 			if (parentWidth) {
-				jssor_slider1.$ScaleWidth(parentWidth);
+				slider.$ScaleWidth(parentWidth);
 			}
 			else {
 				window.setTimeout(scaleSlider, 30);
@@ -124,21 +133,18 @@ var ImagesLoader = function() {
 	}
 }
 
-var ViewModel = function() {
+/*
+	This object is responsible for map controlling.
+	Load gps coodinates for markers and show/hide them according to selected places set.
+*/
+var MapController = function(viewModel) {
 	var self = this;
-
-	this.placesFilterString = ko.observable();
-	this.selectedPlaces = ko.observableArray([]);
-	self.imageLoader = new ImagesLoader();
-
-
-	Places.forEach(function(place) {
-		self.imageLoader.loadPlacePictures(place);
-		self.selectedPlaces.push(new Place(place));
-	});
+	self.viewModel = viewModel;
 
 	/*
-	  createMapMarker(placeData) reads Google Places search results to create map pins.
+	  createMapMarker(place, placeData) reads Google Places search results to create map pins.
+	  For later manupulations marker saved in place.data
+	  place is a Place object that should be shown by new marker
 	  placeData is the object returned from search results containing information
 	  about a single location.
 	*/
@@ -150,7 +156,7 @@ var ViewModel = function() {
 		var name = place.name();   // name of the place from the place service
 		            // current boundaries of the map window
 
-		// marker is an object with additional data about the pin for a single location
+		// marker is an place object
 		var marker = new google.maps.Marker({
 			map: self.map,
 			position: placeData.geometry.location,
@@ -158,11 +164,9 @@ var ViewModel = function() {
 			icon: place.data.icon
 		});
 
+		// save marker in a place object for later manupulations
 		place.data.marker = marker;
 
-		// infoWindows are the little helper windows that open when you click
-		// or hover over a pin on a map. They usually contain more information
-		// about a location.
 		var infoWindow = new google.maps.InfoWindow({
 			content: name
 		});
@@ -170,7 +174,8 @@ var ViewModel = function() {
 		place.data.infoWindow = infoWindow;
 
 		google.maps.event.addListener(marker, 'click', function() {
-			self.showInfoWindow(place);
+			// notify ViewModel about click on the marker that is needed to separate MapController and ImageLoader using ViewModel.
+			self.viewModel.onPlaceClick(place);
 		});
 
 		self.bounds.extend(new google.maps.LatLng(lat, lon));
@@ -178,17 +183,19 @@ var ViewModel = function() {
 		self.map.setCenter(self.bounds.getCenter());
 	};
 
+
+	// showInfoWindow(place) called when user clicks on marker
 	self.showInfoWindow = function(place) {
 		place.data.infoWindow.open(self.map, place.data.marker);
 		place.data.marker.setAnimation(google.maps.Animation.BOUNCE);
 
+		// Stop animation for marker in 1 second, otherwise marker will jump forever.
 		setTimeout(function() {
 			place.data.marker.setAnimation(null);
 		}, 1000);
-
-		self.imageLoader.showImages(place);
 	}
 
+	// add a new pin on map, called once on map loading
 	self.addNewPin = function(results, status) {
 		if (status == google.maps.places.PlacesServiceStatus.OK) {
 			self.createMapMarker(results[0]);
@@ -196,21 +203,20 @@ var ViewModel = function() {
 	};
 
 	/*
-		pinPoster(locations) takes in the array of locations created by locationFinder()
-		and fires off Google place searches for each location
+		loadPlaces() goes over places and request Google Place Search for gps coordinates.
+		It should be run once to not to send the same request all the time.
 	*/
-	self.pinPoster = function() {
+	self.loadPlaces = function(places) {
 		// creates a Google place search service object. PlacesService does the work of
 		// actually searching for location data.
 		var service = new google.maps.places.PlacesService(self.map);
-		// Iterates through the array of locations, creates a search object for each location
-		var places = self.selectedPlaces();
+		// Iterates through the array of places and load info about them.
+		//var places = self.selectedPlaces();
 		for (var place_i in places) {
-			// the search request object
 			var place = places[place_i];
 			var place_name = place.name();
-			console.log(place_name);
 
+			// the search request object
 			var request = {
 				query: place_name
 			};
@@ -225,7 +231,29 @@ var ViewModel = function() {
 		}
 	};
 
-	self.initMap = function() {
+	// Show markers for currently selected places. If place in places list then marker is shown,
+	// otherwise marker is removed from map
+	self.showMarkers = function(places) {
+		Places.forEach(function(place) {
+			if (null != place.marker) {
+				place.marker.setMap(null);
+			};
+		});
+
+		for (var place_i in places) {
+			var place = places[place_i];
+			if (null != place.data.marker) {
+				place.data.marker.setMap(self.map);
+			}
+		};
+
+		self.map.fitBounds(self.bounds);
+	}
+
+	/*
+		init() creates a map and load places information
+	*/
+	self.init = function() {
 		var mapOptions = {
 				disableDefaultUI: false
 		};
@@ -236,12 +264,35 @@ var ViewModel = function() {
 		window.addEventListener('resize', function(e) {
 			self.map.fitBounds(self.bounds);
 		});
-
-		self.pinPoster();
 	};
 
-	this.initMap();
+	self.init();
+}
 
+var ViewModel = function() {
+	var self = this;
+
+	self.init = function() {
+		this.placesFilterString = ko.observable();
+		this.selectedPlaces = ko.observableArray([]);
+		self.imageLoader = new ImagesLoader();
+		self.mapController = new MapController(self);
+
+		self.mapController.init();
+
+		Places.forEach(function(place) {
+			self.selectedPlaces.push(new Place(place));
+		});
+
+		var selectedPlaces = self.selectedPlaces();
+		self.mapController.loadPlaces(selectedPlaces);
+		self.imageLoader.loadPlaces(selectedPlaces);
+	}
+
+	self.onPlaceClick = function(place) {
+		self.mapController.showInfoWindow(place);
+		self.imageLoader.showImages(place);
+	};
 
 	self.filterPlaces = function() {
 		var filter = self.placesFilterString()
@@ -249,19 +300,14 @@ var ViewModel = function() {
 		var regex = new RegExp(filter, "i");
 
 		Places.forEach(function(place) {
-			var map = null;
 			if (place.name.search(regex) != -1) {
 				self.selectedPlaces.push(new Place(place));
-				map = self.map;
 			};
-
-			if (null != place.marker) {
-				place.marker.setMap(map);
-			};
-
 		});
-		self.map.fitBounds(self.bounds);
+		this.mapController.showMarkers(self.selectedPlaces());
 	};
+
+	self.init();
 }
 
 ko.applyBindings(new ViewModel);
