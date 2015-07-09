@@ -109,14 +109,28 @@ var ImagesLoader = function() {
 
 		var $pictures = $('.pictures'),
 			options,
-			slider;
+			slider,
+			picture_i,
+			pictures_size = place.data.images.length,
+			slide_tpl = '<div class="slide"><img class="img-responsive" id="{%slide-image-id%}" u="image"/></div>';
 
-		place.data.images.forEach(
+		for(picture_i = 0; picture_i < pictures_size; picture_i +=1) {
+			$pictures.append(slide_tpl.replace('{%slide-image-id%}', 'slide-image-' + picture_i));
+			$('#slide-image-' + picture_i)
+    			.error(function() {
+    				$('#slider').remove();
+    				self.showError("Failed to load Flickr images. Please, try later.");
+    			})
+    			.attr("src", place.data.images[picture_i]);
+		}
+
+
+		/*place.data.images.forEach(
 			function(image){
 				var slide = '<div class="slide"><img class="img-responsive" u="image" src="' + image + '" /></div>';
 				$pictures.append(slide);
 			}
-		);
+		);*/
 
 		options = {
 			$DragOrientation: 3,     //[Optional] Orientation to drag slide, 0 no drag, 1 horizental, 2 vertical, 3 either, default value is 1 (Note that the $DragOrientation should be the same as $PlayOrientation when $DisplayPieces is greater than 1, or parking position is not 0)
