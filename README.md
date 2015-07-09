@@ -14,3 +14,7 @@ External projects used:
  - Google Places API
  - Flickr API
 
+Full version of files:
+  index.full.html
+  css/style.css
+  js/app.js

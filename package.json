@@ -1,0 +1,10 @@
+{
+  "name": "fend-p5-neighorhoood-map",
+  "version": "0.1.0",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-cssmin": "^0.12.3",
+    "grunt-contrib-htmlmin": "^0.4.0",
+    "grunt-contrib-uglify": "^0.9.1"
+  }
+}

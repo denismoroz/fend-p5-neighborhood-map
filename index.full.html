@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Neighborhood Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/style.min.css" rel="stylesheet" type="text/css">
+    <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <div class="container-fluid" id="main">
+
+        <div class="row">
+            <h1> Minsk places to visit</h1>
+        </div>
+
+        <div class="row search">
+            <div class="col-md-4">
+                <div class="search-bar">
+                    <div class="search-line">
+                        <span class="search-icon glyphicon glyphicon-search" aria-hidden="true"></span>
+                        <input class="search-input" type="text" data-bind="textInput: placesFilterString, event: {keyup: filterPlaces}">
+                    </div>
+
+                    <ul data-bind="foreach: selectedPlaces">
+                        <li>
+                            <b data-bind="text: name, click: $parent.onPlaceClick"></b>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="map-container col-md-8">
+                <div class="map"></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <h2 class="place-name"></h2>
+            <div class="slider-container col-md-12">
+            </div>
+        </div>
+    </div>
+
+    <script src="http://maps.googleapis.com/maps/api/js?libraries=places"></script>
+    <script src="bower_components/knockout/dist/knockout.js"></script>
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/jssor-slider/js/jssor.slider.mini.js"></script>
+    <script src="js/app.min.js"></script>
+</body>
+</html>
