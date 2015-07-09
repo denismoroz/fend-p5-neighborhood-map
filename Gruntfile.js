@@ -7,7 +7,7 @@ module.exports = function(grunt) {
       },
       my_target: {
         files: {
-          'js/app.min.js': ['js/app.js']
+          'dist/js/app.js': ['js/app.js']
         }
       }
     },
@@ -18,7 +18,7 @@ module.exports = function(grunt) {
       },
       target: {
         files: {
-          'css/style.min.css': ['css/style.css']
+          'dist/css/style.css': ['css/style.css']
         }
       }
     },
@@ -29,8 +29,23 @@ module.exports = function(grunt) {
           collapseWhitespace: true
         },
         files: {
-          'index.html': 'index.full.html'
+          'dist/index.html': 'index.html'
         }
+      }
+    },
+    copy: {
+      main: {
+        files: [
+          {expand: true, src: ['images/*'], dest: 'dist/', filter: 'isFile'},
+          {expand: true, src: ['bower_components/bootstrap/dist/css/bootstrap.min.css'],
+              dest: 'dist/'},
+          {expand: true, src: ['bower_components/knockout/dist/knockout.js'],
+              dest: 'dist/'},
+          {expand: true, src: ['bower_components/jquery/dist/jquery.min.js'],
+              dest: 'dist/'},
+          {expand: true, src: ['bower_components/jssor-slider/js/jssor.slider.mini.js'],
+              dest: 'dist/'}
+        ]
       }
     }
   });
@@ -38,8 +53,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-htmlmin');
+  grunt.loadNpmTasks('grunt-contrib-copy');
 
   // Default task(s).
-  grunt.registerTask('default', ['uglify', 'cssmin', 'htmlmin']);
+  grunt.registerTask('default', ['uglify', 'cssmin', 'htmlmin', 'copy']);
 
 };

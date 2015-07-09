@@ -1,4 +1,12 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Minsk Neighborhood Map</title><meta name="viewport" content="width=device-width,initial-scale=1"><script>/*!
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Minsk Neighborhood Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <script>
+      /*!
         loadCSS: load a CSS file asynchronously.
         [c]2014 @scottjehl, Filament Group, Inc.
         Licensed MIT
@@ -31,8 +39,11 @@
         // This function sets the link's media back to `all` so that the stylesheet applies once it loads
         // It is designed to poll until document.styleSheets includes the new sheet.
         ss.onloadcssdefined = function( cb ){
-          var defined;
-          for( var i = 0; i < sheets.length; i++ ){
+          var defined,
+              i,
+              sheets_size = sheets.length;
+
+          for(i = 0; i < sheets_size; i++ ) {
             if( sheets[ i ].href && sheets[ i ].href === ss.href ){
               defined = true;
             }
@@ -51,5 +62,52 @@
         return ss;
       }
 
-      loadCSS("css/style.min.css");
-      loadCSS("bower_components/bootstrap/dist/css/bootstrap.min.css");</script></head><body><div class="container-fluid" id="main"><div class="row"><h1>Minsk places to visit</h1></div><div class="row search"><div class="col-md-4"><div class="search-bar"><div class="search-line"><span class="search-icon glyphicon glyphicon-search" aria-hidden="true"></span> <input class="search-input" type="text" data-bind="textInput: placesFilterString, event: {keyup: filterPlaces}"></div><ul data-bind="foreach: selectedPlaces"><li><b data-bind="text: name, click: $parent.onPlaceClick"></b></li></ul></div></div><div class="map-container col-md-8"><div class="map"></div></div></div><div class="row"><h2 class="place-name"></h2><div class="slider-container col-md-12"></div></div></div><script src="http://maps.googleapis.com/maps/api/js?libraries=places"></script><script src="bower_components/knockout/dist/knockout.js"></script><script src="bower_components/jquery/dist/jquery.min.js"></script><script src="bower_components/jssor-slider/js/jssor.slider.mini.js"></script><script src="js/app.min.js"></script></body></html>
+      loadCSS("css/style.css");
+      loadCSS("bower_components/bootstrap/dist/css/bootstrap.min.css");
+    </script>
+</head>
+<body>
+    <div class="container-fluid" id="main">
+
+        <div class="row">
+            <div class="col-md-12">
+                <h1> Minsk places to visit</h1>
+            </div>
+        </div>
+
+        <div class="row search">
+            <div class="col-md-4">
+                <div class="search-bar">
+                    <div class="search-line">
+                        <span class="search-icon glyphicon glyphicon-search" aria-hidden="true"></span>
+                        <input class="search-input" type="text" data-bind="textInput: placesFilterString, event: {keyup: filterPlaces}">
+                    </div>
+
+                    <ul data-bind="foreach: selectedPlaces">
+                        <li>
+                            <b data-bind="text: name, click: $parent.onPlaceClick"></b>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="map-container col-md-8">
+                <div class="map"></div>
+            </div>
+        </div>
+
+        <div class="row">
+             <div class="col-md-12">
+                <h2 class="place-name"></h2>
+                <div class="slider-container">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="http://maps.googleapis.com/maps/api/js?libraries=places"></script>
+    <script src="bower_components/knockout/dist/knockout.js"></script>
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/jssor-slider/js/jssor.slider.mini.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
