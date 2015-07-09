@@ -124,14 +124,6 @@ var ImagesLoader = function() {
     			.attr("src", place.data.images[picture_i]);
 		}
 
-
-		/*place.data.images.forEach(
-			function(image){
-				var slide = '<div class="slide"><img class="img-responsive" u="image" src="' + image + '" /></div>';
-				$pictures.append(slide);
-			}
-		);*/
-
 		options = {
 			$DragOrientation: 3,     //[Optional] Orientation to drag slide, 0 no drag, 1 horizental, 2 vertical, 3 either, default value is 1 (Note that the $DragOrientation should be the same as $PlayOrientation when $DisplayPieces is greater than 1, or parking position is not 0)
 			$SlideDuration: 500,     //[Optional] Specifies default duration (swipe) for slide in milliseconds, default value is 500
@@ -224,6 +216,13 @@ var MapController = function(viewModel) {
 			self.showError('Google Maps Components are not loaded. Please try later.');
 			return;
 		}
+
+		// Close previously open info windows
+		Places.forEach(function(place) {
+			if (null !== place.marker) {
+				place.infoWindow.close();
+			}
+		});
 
 		place.data.infoWindow.open(self.map, place.data.marker);
 		place.data.marker.setAnimation(google.maps.Animation.BOUNCE);
