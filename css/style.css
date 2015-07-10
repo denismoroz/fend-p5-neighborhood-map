@@ -1,46 +1,7 @@
-/* jssor slider arrow navigator skin 01 css */
-/*
-.jssora01l                  (normal)
-.jssora01r                  (normal)
-.jssora01l:hover            (normal mouseover)
-.jssora01r:hover            (normal mouseover)
-.jssora01l.jssora01ldn      (mousedown)
-.jssora01r.jssora01rdn      (mousedown)
-*/
-.jssora01l,
-.jssora01r {
-	display: block;
-	position: absolute;
-	/* size of arrow element */
-	width: 45px;
-	height: 45px;
-	cursor: pointer;
-	background: url(../images/a01.png) no-repeat;
-	overflow: hidden;
-}
 
-.jssora01l {
-	background-position: -8px -38px;
-}
-
-.jssora01r {
-	background-position: -68px -38px;
-}
-
-.jssora01l:hover {
-	background-position: -128px -38px;
-}
-
-.jssora01r:hover {
-	background-position: -188px -38px;
-}
-
-.jssora01l.jssora01ldn {
-	background-position: -8px -38px;
-}
-
-.jssora01r.jssora01rdn {
-	background-position: -68px -38px;
+body {
+	padding-top: 70px;
+	background-color: #e0f2f1;
 }
 
 img,
@@ -50,51 +11,14 @@ video {
 	max-width: 100%;
 }
 
-.row {
-	width: 900px;
-	max-width: 100%;
-	margin: 0 auto 0 auto;
-}
-
-#slider {
-	max-width: 100%;
-	position: relative;
-	width: 900px;
-	height: 600px;
-}
-
-.jssora01l {
-	top: 50px;
-	left: 8px;
-}
-
-.jssora01r {
-	top: 50px;
-	right: 8px;
-}
-
-.pictures {
-	max-width: 100%;
-	cursor: move;
-	position: absolute;
-	overflow: hidden;
-	width: 900px;
-	height: 600px;
-}
-
 .map {
 	display: block;
 	height: 100%;
 }
 
 .map-container {
-	height: 300px;
+	height: 100vh;
 	width: 100%;
-	padding-bottom: 5%;
-}
-
-.search-bar {
-	margin-top: 2%;
 }
 
 .search-line {
@@ -103,6 +27,7 @@ video {
 
 .search-input {
 	width: 100%;
+	background-color: #b2dfdb;
 }
 
 .search-icon {
@@ -110,11 +35,8 @@ video {
 	margin-top: 2%;
 }
 
-.search {
-	display: flex;
-}
-
-h1 {
+h1,
+.modal-title {
 	text-align: center;
 }
 
@@ -122,8 +44,50 @@ h1 {
 	text-align: center;
 }
 
-@media only screen and (max-width: 480px) {
-  .search {
-    display: block;
-  }
+.sidebar {
+	padding: 20px;
+	background-color: #80cbc4;
+	border-right: 1px solid #eee;
+}
+
+.modal-dialog {
+
+}
+
+.thumbnail {
+	margin: 0 auto 6px auto;
+}
+
+.carousel-control.left,
+.carousel-control.right {
+	background-image: none;
+	margin-top: 10%;
+	width: 5%;
+}
+
+.carousel-control.right {
+	margin-right: -15px;
+}
+
+.item {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.navbar {
+	background-color: #009688;
+}
+
+.navbar-default .navbar-brand {
+    color: white;
+}
+
+.navbar-default .navbar-toggle .icon-bar {
+	background-color: white;
+}
+
+@media only screen and (min-width: 990px) {
+	.map-container {
+		width: 75%;
+	}
 }

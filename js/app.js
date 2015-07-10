@@ -44,24 +44,13 @@ var Place = function (data) {
 	Request images from flickr api and show them in jssor slider
 */
 
-var ImagesLoader = function() {
+var ImagesLoader = function(viewModel) {
 	'use strict';
 
 	var self = this;
 
+	self.viewModel = viewModel;
 	self.apiKey = '6c64e861d08e001df254252d9e8ff9a1';
-	self.sliderTemplate = '<div id="slider">' +
-				'<div class="pictures" u="slides" ></div>' +
-				'<span u="arrowleft" class="jssora01l"></span>' +
-				'<span u="arrowright" class="jssora01r"></span>' +
-			'</div>';
-
-	self.$sliderContainer = $('.slider-container');
-	self.$placeName = $('.place-name');
-
-	self.showError = function(message) {
-		self.$sliderContainer.html('<h3> ' + message + '</h3>');
-	};
 
 	self.loadPlaces = function(places) {
 		places.forEach(function(place) {
@@ -96,7 +85,7 @@ var ImagesLoader = function() {
 			}
 		)
 		.fail(function() {
-			self.showError('Failed to load images from Flickr, please try later');
+			self.viewModel.showAlert('warning', '<strong>Network error!</strong> Failed to load images from Flickr, please try later');
   		});
 	};
 
@@ -104,54 +93,33 @@ var ImagesLoader = function() {
 		showImages(place) for selected place load images to slider.
 	*/
 	self.showImages = function (place) {
-		$('#slider').remove();
-		self.$sliderContainer.append(self.sliderTemplate);
 
-		var $pictures = $('.pictures'),
-			options,
-			slider,
+		var $content = $(".carousel-inner"),
+			$title = $(".modal-title"),
 			picture_i,
 			pictures_size = place.data.images.length,
-			slide_tpl = '<div class="slide"><img class="img-responsive" id="{%slide-image-id%}" u="image"/></div>';
+			item_tpl = '<div class="item" id="{%item-id%}"><img class="thumbnail img-responsive" id="{%item-image-id%}" u="image"/></div>';
+
+		$content.empty();
+		$title.empty();
+
+		$title.text(place.name());
 
 		for(picture_i = 0; picture_i < pictures_size; picture_i +=1) {
-			$pictures.append(slide_tpl.replace('{%slide-image-id%}', 'slide-image-' + picture_i));
-			$('#slide-image-' + picture_i)
+			$content.append(item_tpl
+				.replace('{%item-image-id%}', 'item-image-' + picture_i)
+				.replace('{%item-id%}', 'item-' + picture_i)
+			);
+
+			$('#item-image-' + picture_i)
     			.error(function() {
-    				$('#slider').remove();
-    				self.showError("Failed to load Flickr images. Please, try later.");
+    				$('#modal-gallery').modal('hide');
+    				self.viewModel.showAlert('warning', 'Failed to load images from Flickr, please try later');
     			})
     			.attr("src", place.data.images[picture_i]);
 		}
-
-		options = {
-			$DragOrientation: 3,     //[Optional] Orientation to drag slide, 0 no drag, 1 horizental, 2 vertical, 3 either, default value is 1 (Note that the $DragOrientation should be the same as $PlayOrientation when $DisplayPieces is greater than 1, or parking position is not 0)
-			$SlideDuration: 500,     //[Optional] Specifies default duration (swipe) for slide in milliseconds, default value is 500
-
-			$ArrowNavigatorOptions: {          //[Optional] Options to specify and enable arrow navigator or not
-				$Class: $JssorArrowNavigator$, //[Requried] Class to create arrow navigator instance
-				$ChanceToShow: 2,              //[Required] 0 Never, 1 Mouse Over, 2 Always
-				$AutoCenter: 0,                //[Optional] Auto center arrows in parent container, 0 No, 1 Horizontal, 2 Vertical, 3 Both, default value is 0
-				$Steps: 1                      //[Optional] Steps to go for each navigation request, default value is 1
-			}
-		};
-
-		slider = new $JssorSlider$('slider', options);
-
-		function scaleSlider() {
-			var parentWidth = $('.slider').parent().width();
-			if (parentWidth) {
-				slider.$ScaleWidth(parentWidth);
-			}
-			else {
-				window.setTimeout(scaleSlider, 30);
-			}
-		}
-		scaleSlider();
-		$(window).bind('load', scaleSlider);
-		$(window).bind('resize', scaleSlider);
-		$(window).bind('orientationchange', scaleSlider);
-		self.$placeName.text(place.name());
+		$('#item-0').addClass('active');
+		$('#modal-gallery').modal('show');
 	};
 };
 
@@ -163,11 +131,6 @@ var MapController = function(viewModel) {
 	'use strict';
 	var self = this;
 	self.viewModel = viewModel;
-
-
-	self.showError = function(message) {
-		$('.map').append('<h3>' + message + '</h3>');
-	};
 
 	/*
 	  createMapMarker(place, placeData) reads Google Places search results to create map pins.
@@ -213,7 +176,8 @@ var MapController = function(viewModel) {
 	// showInfoWindow(place) called when user clicks on marker
 	self.showInfoWindow = function(place) {
 		if (place.data.infoWindow === undefined) {
-			self.showError('Google Maps Components are not loaded. Please try later.');
+			self.viewModel.showAlert('warning',
+				'<strong>Network Error!</strong> Google Maps Components are not loaded. Please try later.');
 			return;
 		}
 
@@ -249,7 +213,7 @@ var MapController = function(viewModel) {
 		// actually searching for location data.
 
 		if (window.google === undefined) {
-			self.showError('Failed to load Google.PlacesService to request places information');
+			self.viewModel.showAlert('warning', '<strong>Network Error!</strong>Failed to load Google.PlacesService to request places information');
 			return;
 		}
 
@@ -308,7 +272,7 @@ var MapController = function(viewModel) {
 		};
 
 		if (window.google === undefined) {
-			self.showError('Failed to load Google Map Components, please try later.');
+			self.viewModel.showAlert('warning', 'Failed to load Google Map Components, please try later.');
 			return;
 		}
 
@@ -328,10 +292,11 @@ var ViewModel = function() {
 
 	var self = this;
 
+
 	self.init = function() {
 		this.placesFilterString = ko.observable();
 		this.selectedPlaces = ko.observableArray([]);
-		self.imageLoader = new ImagesLoader();
+		self.imageLoader = new ImagesLoader(self);
 		self.mapController = new MapController(self);
 
 		Places.forEach(function(place) {
@@ -341,6 +306,14 @@ var ViewModel = function() {
 		var selectedPlaces = self.selectedPlaces();
 		self.mapController.loadPlaces(selectedPlaces);
 		self.imageLoader.loadPlaces(selectedPlaces);
+	};
+
+	self.showAlert = function(type, message) {
+		var alert = '<div class="alert alert-' + type + ' alert-dismissible" role="alert">' +
+                    	'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                    	message +
+                	'</div>';
+        $('.alert-container').html(alert);
 	};
 
 	self.onPlaceClick = function(place) {
