@@ -1,5 +1,13 @@
-/*global ko, $, $JssorArrowNavigator$, $JssorSlider$, window, google, setTimeout, document*/
+/**
+	Entering point for Neighborhood Map project.
+	@author	Denis Moroz
+*/
 
+/*global ko, $, window, google, setTimeout, document*/
+
+/**
+	Places that is worth to visit in Minsk and its Neighbornood.
+*/
 var Places = [
 	{
 		name: 'National Library of Belarus',
@@ -40,18 +48,23 @@ var Places = [
 	}
 ];
 
-
+/**
+	Class to wrap Places data.
+	@class
+	@param {Places.item} data - item to be stored
+*/
 var Place = function (data) {
 	'use strict';
 	this.name = ko.observable(data.name);
 	this.data = data;
 };
 
-
-/*
-	Request images from flickr api and show them in jssor slider
+/**
+	Request images from Flickr api and show them in bootstrap modal window.
+	This class will be incapsulated inside ViewModel.
+	@class
+	@param {ViewModel} viewModel - item to be stored.
 */
-
 var ImagesLoader = function(viewModel) {
 	'use strict';
 
@@ -66,6 +79,14 @@ var ImagesLoader = function(viewModel) {
 		});
 	};
 
+	/**
+		Load images for specific place using Flicker api.
+		If image failed to load notify viewModal to showAlert to user.
+
+		@memberof ImagesLoader
+		@method loadImages
+		@param {Place} place - place to load
+	*/
 	self.loadImages = function (place) {
 
 		//query the Flickr API
@@ -97,8 +118,12 @@ var ImagesLoader = function(viewModel) {
   		});
 	};
 
-	/*
-		showImages(place) for selected place load images to slider.
+	/**
+		Show images for selected place and load tem to bootstrap carousel.
+		If loading images failed, viewModel will be notified to show error to user.
+		@param {Place} place - place to show
+		@memberof ImagesLoader
+		@method showImages
 	*/
 	self.showImages = function (place) {
 
@@ -131,21 +156,25 @@ var ImagesLoader = function(viewModel) {
 	};
 };
 
-/*
+/**
 	This object is responsible for map controlling.
 	Load gps coodinates for markers and show/hide them according to selected places set.
+	@class
+	@param {ViewModel} viewModel - main controller object that incapsulates this controller.
 */
 var MapController = function(viewModel) {
 	'use strict';
 	var self = this;
 	self.viewModel = viewModel;
 
-	/*
-	  createMapMarker(place, placeData) reads Google Places search results to create map pins.
-	  For later manupulations marker saved in place.data
-	  place is a Place object that should be shown by new marker
-	  placeData is the object returned from search results containing information
-	  about a single location.
+	/**
+		Reads Google Places search results to create map pins.
+		For later manupulations marker saved in place.data
+		@param {Place} place - object that should be pointed by new marker
+		@param {placeData} placeData - object returned from search results containing information about a single location.
+
+		@memberof MapController
+		@method createMapMarker
 	*/
 	self.createMapMarker = function (place, placeData) {
 
@@ -181,8 +210,16 @@ var MapController = function(viewModel) {
 		self.map.setCenter(self.bounds.getCenter());
 	};
 
-	// showInfoWindow(place) called when user clicks on marker
+	/**
+		Show info window for marker attached to specific plase.
+		@param {Place} place - place that selected by user.
+
+		@memberof MapController
+		@method showInfoWindow
+	*/
 	self.showInfoWindow = function(place) {
+
+		// check if info window is created
 		if (place.data.infoWindow === undefined) {
 			self.viewModel.showAlert('warning',
 				'<strong>Network Error!</strong> Google Maps Components are not loaded. Please try later.');
@@ -205,16 +242,27 @@ var MapController = function(viewModel) {
 		}, 1000);
 	};
 
-	// add a new pin on map, called once on map loading
+	/**
+		Add a new pin on map, called once on map loading.
+		@param results - responce from GooglePlacesService
+		@param status - status of request to Google Place service
+
+		@memberof MapController
+		@method addNewPin
+	*/
 	self.addNewPin = function(results, status) {
 		if (status === google.maps.places.PlacesServiceStatus.OK) {
 			self.createMapMarker(results[0]);
 		}
 	};
 
-	/*
-		loadPlaces() goes over places and request Google Place Search for gps coordinates.
+	/**
+		Goes over places and request Google Place Search for gps coordinates.
 		It should be run once to not to send the same request all the time.
+		@param {Places} places - places that GooglePlaceSearch should be requested
+
+		@memberof MapController
+		@method loadPlaces
 	*/
 	self.loadPlaces = function(places) {
 		// creates a Google place search service object. PlacesService does the work of
@@ -247,8 +295,13 @@ var MapController = function(viewModel) {
 		});
 	};
 
-	// Show markers for currently selected places. If place in places list then marker is shown,
-	// otherwise marker is removed from map
+	/**
+		Show markers for currently selected places. If place in places list then marker is shown, otherwise marker is removed from map
+		@param {Places} places - filtered places by list view.
+
+		@memberof MapController
+		@method showMarkers
+	*/
 	self.showMarkers = function(places) {
 		Places.forEach(function(place) {
 			if (null !== place.marker) {
@@ -271,8 +324,10 @@ var MapController = function(viewModel) {
 		self.map.fitBounds(self.bounds);
 	};
 
-	/*
-		init() creates a map and load places information
+	/**
+		Creates a map and load places information.
+		@memberof MapController
+		@method init
 	*/
 	self.init = function() {
 		var mapOptions = {
@@ -295,12 +350,20 @@ var MapController = function(viewModel) {
 	self.init();
 };
 
+/**
+	Main Controller for application.
+	@class
+*/
 var ViewModel = function() {
 	'use strict';
 
 	var self = this;
 
-
+	/**
+		Initialized incapsulated controllers: ImageLoader and MapConroller
+		@memberof ViewModel
+		@method init
+	*/
 	self.init = function() {
 		this.placesFilterString = ko.observable();
 		this.selectedPlaces = ko.observableArray([]);
@@ -316,6 +379,13 @@ var ViewModel = function() {
 		self.imageLoader.loadPlaces(selectedPlaces);
 	};
 
+	/**
+		Shows aler to user.
+		@param {string} type - warning, success, info, danger
+		@param {string} message - any string contains alert message
+		@memberof ViewModel
+		@method showAlert
+	*/
 	self.showAlert = function(type, message) {
 		var alert = '<div class="alert alert-' + type + ' alert-dismissible" role="alert">' +
                     	'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
@@ -324,11 +394,23 @@ var ViewModel = function() {
         $('.alert-container').html(alert);
 	};
 
+	/**
+		Executed once user clics on item in ListView or map marker
+		@param {Place} place - clicked place
+		@memberof ViewModel
+		@method onPlaceClick
+	*/
 	self.onPlaceClick = function(place) {
 		self.mapController.showInfoWindow(place);
 		self.imageLoader.showImages(place);
 	};
 
+	/**
+		Filter function for ListView control.
+		Filters Places on name and tags.
+		@memberof ViewModel
+		@method filterPlaces
+	*/
 	self.filterPlaces = function() {
 		var filter = self.placesFilterString(),
 			regex = new RegExp(filter, 'i');
@@ -347,4 +429,5 @@ var ViewModel = function() {
 	self.init();
 };
 
+// Get ready! Go!
 ko.applyBindings(new ViewModel());

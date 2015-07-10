@@ -1,4 +1,7 @@
+/*global module*/
+
 module.exports = function(grunt) {
+  'use strict';
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     uglify: {
@@ -49,6 +52,15 @@ module.exports = function(grunt) {
               dest: 'dist/'}
         ]
       }
+    },
+    jsdoc: {
+      dist: {
+          src: ['js/*.js', 'README.md'],
+          jsdoc: './node_modules/.bin/jsdoc',
+          options: {
+              destination: 'doc'
+          }
+      }
     }
   });
 
@@ -56,8 +68,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-htmlmin');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-jsdoc');
 
   // Default task(s).
-  grunt.registerTask('default', ['uglify', 'cssmin', 'htmlmin', 'copy']);
+  grunt.registerTask('default', ['uglify', 'cssmin', 'htmlmin', 'copy', 'jsdoc']);
 
 };
