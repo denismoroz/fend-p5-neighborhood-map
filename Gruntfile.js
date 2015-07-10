@@ -37,13 +37,15 @@ module.exports = function(grunt) {
       main: {
         files: [
           {expand: true, src: ['images/*'], dest: 'dist/', filter: 'isFile'},
-          {expand: true, src: ['bower_components/bootstrap/dist/css/bootstrap.min.css'],
+          {expand: true, src: ['bower_components/bootstrap/dist/css/bootstrap.min.css',
+                               'bower_components/bootstrap/dist/js/bootstrap.min.js',
+                               'bower_components/bootstrap/dist/fonts/*',
+                               'bower_components/bootstrap-sidebar/dist/css/sidebar.css',
+                               'bower_components/bootstrap-sidebar/dist/js/sidebar.js'],
               dest: 'dist/'},
           {expand: true, src: ['bower_components/knockout/dist/knockout.js'],
               dest: 'dist/'},
           {expand: true, src: ['bower_components/jquery/dist/jquery.min.js'],
-              dest: 'dist/'},
-          {expand: true, src: ['bower_components/jssor-slider/js/jssor.slider.mini.js'],
               dest: 'dist/'}
         ]
       }

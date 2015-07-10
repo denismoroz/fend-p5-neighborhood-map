@@ -3,32 +3,40 @@
 var Places = [
 	{
 		name: 'National Library of Belarus',
-		icon: 'images/library.png'
+		icon: 'images/library.png',
+		tags: 'library, books, cultural center'
 	},
 	{
 		name: 'Victory Square, Minsk',
-		icon: 'images/citysquare.png'
+		icon: 'images/citysquare.png',
+		tags: 'historic center, victory momument'
 	},
 	{
 		name: 'Minsk Arena',
-		icon: 'images/bike_rising.png'
+		icon: 'images/bike_rising.png',
+		tags: 'sport, entertament, hockey'
 	},
 	{
 		name: 'Dudutki Museum',
-		icon: 'images/museum_openair.png'
+		icon: 'images/museum_openair.png',
+		tags: 'belorussian rural cultural center, belarussian crafts'
 	},
 	{
 		name: 'Church of Saints Simon and Helena',
-		icon: 'images/church.png'
+		icon: 'images/church.png',
+		tags: 'neo-romanesque church'
 	},
 
 	{
 		name: 'Victory Park, Minsk',
-		icon: 'images/forest.png'
+		icon: 'images/forest.png',
+		tags: 'square, bicycle road, fountain'
+
 	},
 	{
 		name: 'Stalin Line',
-		icon: 'images/museum_war.png'
+		icon: 'images/museum_war.png',
+		tags: 'line of fortifications, open air museum'
 	}
 ];
 
@@ -328,7 +336,8 @@ var ViewModel = function() {
 		this.selectedPlaces.removeAll();
 
 		Places.forEach(function(place) {
-			if (place.name.search(regex) !== -1) {
+			if (place.name.search(regex) !== -1 ||
+				place.tags.search(regex) !== -1) {
 				self.selectedPlaces.push(new Place(place));
 			}
 		});
